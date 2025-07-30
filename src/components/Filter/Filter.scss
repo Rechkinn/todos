@@ -1,0 +1,25 @@
+.hidden {
+  position: absolute;
+  top: 0;
+  left: 0;
+  scale: 0;
+}
+
+.filter {
+  &__primary {
+    padding: 0 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  &__add {
+    width: 100%;
+    padding: 0 10px;
+    display: flex;
+  }
+  &__input {
+    width: 100%;
+  }
+  &__button-add {
+  }
+}

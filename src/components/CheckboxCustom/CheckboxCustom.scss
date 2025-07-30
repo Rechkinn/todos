@@ -1,0 +1,79 @@
+@use "../../styles/variables";
+@use "../../styles/mixins.scss" as mixin;
+$color: rgb(199, 199, 199);
+.checkbox {
+  display: flex;
+
+  &__input {
+    display: flex;
+    align-items: center;
+    padding-right: 10px;
+    // $color: rgb(199, 199, 199);
+    &-custom {
+      cursor: pointer;
+      position: relative;
+      left: 0;
+      display: block;
+      $wh: 20px;
+      width: $wh;
+      height: $wh;
+      background-color: $color;
+      border-radius: 3px;
+      box-shadow: inset 0 0 1px 0 rgb(149, 149, 149);
+    }
+    &-original:checked + &-custom {
+      background-color: var(--color-purple);
+    }
+
+    &-original:checked + &-custom::before,
+    &-original:checked + &-custom::after {
+      content: "";
+      display: block;
+      height: 2px;
+      background-color: white;
+      border-radius: 5px;
+    }
+
+    &-original:checked + &-custom::before {
+      position: absolute;
+      top: 59%;
+      left: 0.8px;
+      width: 40%;
+      rotate: 45deg;
+    }
+    &-original:checked + &-custom::after {
+      position: absolute;
+      top: 45%;
+      right: 0;
+      width: 80%;
+      rotate: -45deg;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    color: rgb(83, 83, 83);
+  }
+
+  &__label {
+    font-size: 12px;
+    font-weight: bold;
+    font-family: sans-serif;
+    transition: all 200ms linear;
+    user-select: none;
+
+    &_complete {
+      text-decoration: line-through;
+      color: $color;
+    }
+  }
+
+  &__data {
+    display: block;
+    font-size: 7px;
+    font-family: sans-serif;
+    font-weight: 400;
+    text-decoration: none;
+  }
+}

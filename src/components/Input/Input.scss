@@ -1,0 +1,11 @@
+.input {
+  border: 0;
+
+  &_add-to-do {
+    width: 100%;
+    height: 100%;
+    $border-radius: 10px;
+    border-top-left-radius: $border-radius;
+    border-bottom-left-radius: $border-radius;
+  }
+}

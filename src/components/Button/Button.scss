@@ -1,0 +1,45 @@
+@use "../../styles/variables";
+@use "../../styles/mixins" as mixin;
+
+button {
+  background-color: transparent;
+  border: 0;
+}
+
+.button {
+  background-color: transparent;
+  border: 0;
+
+  &_purple {
+    @include mixin.font(var(--font-size-20));
+    background-color: var(--color-purple);
+    color: white;
+    width: 136px;
+    border-radius: 10px;
+  }
+
+  &_create-task {
+    padding: 7px 14px;
+  }
+  &_add-task {
+    padding: 3px 14px;
+    $border-radius: 0px;
+    border-top-left-radius: $border-radius;
+    border-bottom-left-radius: $border-radius;
+  }
+
+  &_for-todo {
+    padding: 4px;
+    $wh: 17px;
+    width: $wh;
+    height: $wh;
+    background-color: rgb(221, 221, 221);
+    border-radius: 3px;
+  }
+  &_for-todo:nth-child(2n + 1) {
+    margin-right: 5px;
+  }
+  &_for-todo :nth-child(1n) {
+    object-fit: contain;
+  }
+}
