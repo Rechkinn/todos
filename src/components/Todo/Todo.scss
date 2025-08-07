@@ -12,12 +12,19 @@ h3 {
     // height: 50px;
     background-color: white;
     border-radius: 5px;
+
+    &_for-change-todo {
+      justify-content: start;
+    }
   }
 
   &__buttons {
     // height: 100%;
     display: flex;
     align-items: center;
+    &-change {
+      margin-left: 5px;
+    }
   }
 }
 .todo:not(:last-child) {

@@ -2,15 +2,57 @@ import "./Filter.scss";
 
 import Button from "../Button/Button.jsx";
 import Input from "../Input/Input.jsx";
-import { todos } from "../../../Todos.js";
+import { useState } from "react";
 
 export default function Filter() {
-  function toggleHidden() {
-    let sectionPrimary = document.querySelector(".filter__primary");
-    let sectionAdd = document.querySelector(".filter__add");
+  const [activePanel, setActivePanel] = useState("add");
 
-    sectionPrimary.classList.toggle("hidden");
-    sectionAdd.classList.toggle("hidden");
+  function getElementsActivePanel() {
+    if (activePanel === "primary") {
+      return (
+        <div className="filter__primary">
+          <div className="filter__button-create">
+            <Button
+              onClick={() => {
+                setActivePanel("add");
+              }}
+              styleClasses={"button button_purple button_create-task"}
+            >
+              Create task
+            </Button>
+          </div>
+          <div className="filter__select">
+            <select name="" id="">
+              <option value="Completed">Completed</option>
+              <option value="All">All</option>
+              <option value="Active">Active</option>
+            </select>
+          </div>
+        </div>
+      );
+    } else if (activePanel === "add") {
+      return (
+        <div className="filter__add">
+          <div className="filter__input">
+            <Input
+              placeholder={"to do..."}
+              styleClasses={"input input_add-to-do"}
+            />
+          </div>
+          <div className="filter__button-add">
+            <Button
+              onClick={() => {
+                addTask();
+                setActivePanel("primary");
+              }}
+              styleClasses={"button button_purple button_add-task"}
+            >
+              Add task
+            </Button>
+          </div>
+        </div>
+      );
+    }
   }
 
   function addTask() {
@@ -27,50 +69,17 @@ export default function Filter() {
       body: inputAddToDo.value,
       data: date,
     };
+    const { todos } = todosData;
     todos.push(newToDo);
     console.log(todos);
+    console.log(todosData);
   }
 
   return (
-    <div className="filter">
-      <div className="filter__inner">
-        <div className="filter__primary hidden">
-          <div className="filter__button-create">
-            <Button
-              onClick={toggleHidden}
-              styleClasses={"button button_purple button_create-task"}
-            >
-              Create task
-            </Button>
-          </div>
-          <div className="filter__select">
-            <select name="" id="">
-              <option value="Completed">Completed</option>
-              <option value="All">All</option>
-              <option value="Active">Active</option>
-            </select>
-          </div>
-        </div>
-        <div className="filter__add">
-          <div className="filter__input">
-            <Input
-              placeholder={"to do..."}
-              styleClasses={"input input_add-to-do"}
-            />
-          </div>
-          <div className="filter__button-add">
-            <Button
-              onClick={() => {
-                // toggleHidden()
-                addTask();
-              }}
-              styleClasses={"button button_purple button_add-task"}
-            >
-              Add task
-            </Button>
-          </div>
-        </div>
+    <main>
+      <div className="filter">
+        <div className="filter__inner">{getElementsActivePanel()}</div>
       </div>
-    </div>
+    </main>
   );
 }

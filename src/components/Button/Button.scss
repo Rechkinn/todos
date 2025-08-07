@@ -6,6 +6,10 @@ button {
   border: 0;
 }
 
+button:disabled {
+  opacity: 0.4;
+}
+
 .button {
   background-color: transparent;
   border: 0;
@@ -22,7 +26,8 @@ button {
     padding: 7px 14px;
   }
   &_add-task {
-    padding: 3px 14px;
+    // padding: 3px 14px;
+    padding: 7px 14px;
     $border-radius: 0px;
     border-top-left-radius: $border-radius;
     border-bottom-left-radius: $border-radius;
@@ -35,6 +40,14 @@ button {
     height: $wh;
     background-color: rgb(221, 221, 221);
     border-radius: 3px;
+
+    &_success {
+      background-color: rgb(120, 201, 0);
+    }
+
+    &_cancel {
+      background-color: red;
+    }
   }
   &_for-todo:nth-child(2n + 1) {
     margin-right: 5px;

@@ -1,10 +1,17 @@
 import Todo from "../Todo/Todo";
 import "./List.scss";
-import { todos } from "../../../Todos.js";
+// import { todos } from "../../../Todos.js";
+import todosData from "../../../Todos.json";
 import { useEffect } from "react";
+// import activePanel from "../Filter/Filter.jsx";
 
 export default function List() {
+  // setInterval(() => {
+  //   renderTodos();
+  // }, 1000);
   function renderTodos() {
+    let { todos } = todosData;
+
     return todos.map((todo) => {
       return (
         <Todo key={todo.id} id={todo.id} body={todo.body} data={todo.data} />
@@ -12,9 +19,9 @@ export default function List() {
     });
   }
 
-  useEffect(() => {
-    renderTodos();
-  }, [todos]);
+  // useEffect(() => {
+  //   renderTodos();
+  // }, [todosData]);
 
   return (
     <div className="list">
