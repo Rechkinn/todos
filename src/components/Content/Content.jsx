@@ -88,7 +88,9 @@ export default function Content() {
               onClick={() => {
                 setActivePanel("add");
               }}
-              styleClasses={"button button_purple button_create-task"}
+              styleClasses={
+                "button button_purple button_create-task button_w100"
+              }
             >
               Create task
             </Button>
@@ -116,10 +118,28 @@ export default function Content() {
     } else if (activePanel === "add") {
       return (
         <div className="filter__content">
+          <div className="filter__div-select filter__div-select_panel-add">
+            <select
+              name=""
+              id=""
+              className="filter__select"
+              defaultValue={optionActive}
+            >
+              <option value="All" className="filter__option">
+                All
+              </option>
+              <option value="Completed" className="filter__option">
+                Completed
+              </option>
+              <option value="Active" className="filter__option">
+                Active
+              </option>
+            </select>
+          </div>
           <div className="filter__add">
             <div className="filter__input">
               <Input
-                placeholder={"to do..."}
+                placeholder={"Enter your task"}
                 styleClasses={"input input_add-todo"}
               />
             </div>

@@ -15,11 +15,22 @@ button:disabled {
   border: 0;
 
   &_purple {
-    @include mixin.font(var(--font-size-20));
+    // @include mixin.font(var(--font-size-20));
+    @include mixin.font(20, 10);
     background-color: var(--color-purple);
     color: white;
     width: 136px;
+
+    // display: block;
+    // width: 100%;
+
     border-radius: 10px;
+  }
+
+  &_w100 {
+    @include mixin.media-235() {
+      width: 100%;
+    }
   }
 
   &_create-task {
@@ -34,10 +45,12 @@ button:disabled {
   }
 
   &_for-todo {
-    padding: 4px;
-    $wh: 17px;
-    width: $wh;
-    height: $wh;
+    // padding: 4px;
+    @include mixin.fluid-padding(5, 4);
+    // $wh: 17px;
+    // width: $wh;
+    // height: $wh;
+    @include mixin.fluid-wh(22, 15);
     background-color: rgb(221, 221, 221);
     border-radius: 3px;
 

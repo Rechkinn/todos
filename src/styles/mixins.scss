@@ -1,5 +1,103 @@
-@mixin font($size: 12px) {
+// @mixin font($size: 12px) {
+//   font-family: sans-serif;
+//   font-weight: bold;
+//   font-size: $size;
+// }
+@use "sass:math";
+
+$max-Width: 768;
+$min-Width: 360;
+
+@mixin font($max: 56, $min: 16) {
+  $maxViewportWidth: $max-Width;
+  $minViewportWidth: $min-Width;
+
+  $maxSize: math.div($max, 16);
+  $minSize: math.div($min, 16);
+  $maxWidth: math.div($maxViewportWidth, 16);
+  $minWidth: math.div($minViewportWidth, 16);
+
+  $slope-1: ($maxSize - $minSize);
+  $slope-2: ($maxWidth - $minWidth);
+
+  $slope: math.div($slope-1, $slope-2);
+
+  $yAxisIntersection: (0 - $minWidth) * $slope + $minSize;
+
   font-family: sans-serif;
   font-weight: bold;
-  font-size: $size;
+  font-size: clamp(
+    #{$minSize * 16}px,
+    calc(#{$yAxisIntersection * 16}px + #{$slope * 100}vw),
+    #{$maxSize * 16}px
+  );
+}
+
+@mixin fluid-wh($max: 100, $min: 10, $widthOrHeight: "wh") {
+  $maxViewportWidth: $max-Width;
+  $minViewportWidth: $min-Width;
+
+  $maxSize: math.div($max, 16);
+  $minSize: math.div($min, 16);
+  $maxWidth: math.div($maxViewportWidth, 16);
+  $minWidth: math.div($minViewportWidth, 16);
+
+  $slope-1: ($maxSize - $minSize);
+  $slope-2: ($maxWidth - $minWidth);
+
+  $slope: math.div($slope-1, $slope-2);
+
+  $yAxisIntersection: (0 - $minWidth) * $slope + $minSize;
+
+  @if ($widthOrHeight == "w") {
+    width: clamp(
+      #{$minSize * 16}px,
+      #{calc(#{$yAxisIntersection * 16}px + #{$slope * 100}vw)},
+      #{$maxSize * 16}px
+    );
+  } @else if($widthOrHeight == "h") {
+    height: clamp(
+      #{$minSize * 16}px,
+      #{calc(#{$yAxisIntersection * 16}px + #{$slope * 100}vw)},
+      #{$maxSize * 16}px
+    );
+  } @else {
+    width: clamp(
+      #{$minSize * 16}px,
+      #{calc(#{$yAxisIntersection * 16}px + #{$slope * 100}vw)},
+      #{$maxSize * 16}px
+    );
+    height: clamp(
+      #{$minSize * 16}px,
+      #{calc(#{$yAxisIntersection * 16}px + #{$slope * 100}vw)},
+      #{$maxSize * 16}px
+    );
+  }
+}
+@mixin fluid-padding($max: 100, $min: 10) {
+  $maxViewportWidth: $max-Width;
+  $minViewportWidth: $min-Width;
+
+  $maxSize: math.div($max, 16);
+  $minSize: math.div($min, 16);
+  $maxWidth: math.div($maxViewportWidth, 16);
+  $minWidth: math.div($minViewportWidth, 16);
+
+  $slope-1: ($maxSize - $minSize);
+  $slope-2: ($maxWidth - $minWidth);
+
+  $slope: math.div($slope-1, $slope-2);
+
+  $yAxisIntersection: (0 - $minWidth) * $slope + $minSize;
+  padding: clamp(
+    #{$minSize * 16}px,
+    calc(#{$yAxisIntersection * 16}px + #{$slope * 100}vw),
+    #{$maxSize * 16}px
+  );
+}
+
+@mixin media-235() {
+  @media (max-width: 235px) {
+    @content;
+  }
 }
