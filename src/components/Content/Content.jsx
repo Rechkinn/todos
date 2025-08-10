@@ -37,9 +37,12 @@ export default function Content() {
     option: "All",
   };
 
-  if (JSON.parse(localStorage.getItem("todos"))) {
+  if (localStorage.getItem("todos")) {
+    console.log("wergergr");
     json.todos = JSON.parse(localStorage.getItem("todos")).todos;
     json.option = JSON.parse(localStorage.getItem("todos")).option;
+  } else {
+    localStorage.setItem("todos", JSON.stringify(json));
   }
 
   function selectOption(selectElement) {
