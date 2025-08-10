@@ -38,7 +38,6 @@ export default function Content() {
   };
 
   if (localStorage.getItem("todos")) {
-    console.log("wergergr");
     json.todos = JSON.parse(localStorage.getItem("todos")).todos;
     json.option = JSON.parse(localStorage.getItem("todos")).option;
   } else {
@@ -155,6 +154,14 @@ export default function Content() {
               >
                 Add task
               </Button>
+            </div>
+            <div className="filter__button-add">
+              <Button
+                onClick={() => {
+                  setActivePanel("primary");
+                }}
+                styleClasses={"button button_red button_close-task"}
+              ></Button>
             </div>
           </div>
           {showError && (
