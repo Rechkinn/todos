@@ -116,7 +116,7 @@ export default function Todo({ id, body, data, todos, isChecked, ...props }) {
                 successChange(id);
               }}
             >
-              <img src="../../../public/edit.png" alt="change todo" />
+              <img src="/edit.png" alt="change todo" />
             </Button>
             <Button
               styleClasses={"button button_for-todo button_for-todo_cancel"}
@@ -124,7 +124,7 @@ export default function Todo({ id, body, data, todos, isChecked, ...props }) {
                 closePanelChange();
               }}
             >
-              <img src="../../../public/trash.png" alt="delete todo" />
+              <img src="/trash.png" alt="delete todo" />
             </Button>
           </div>
         </>
@@ -148,7 +148,7 @@ export default function Todo({ id, body, data, todos, isChecked, ...props }) {
               }}
               // disabled={isButtonDisabled}
             >
-              <img src="../../../public/edit.png" alt="" />
+              <img src="/edit.png" alt="" />
             </Button>
             <Button
               styleClasses={"button button_for-todo"}
@@ -156,7 +156,7 @@ export default function Todo({ id, body, data, todos, isChecked, ...props }) {
                 deleteTodo(id);
               }}
             >
-              <img src="../../../public/trash.png" alt="" />
+              <img src="/trash.png" alt="" />
             </Button>
           </div>
         </>
