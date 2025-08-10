@@ -116,7 +116,10 @@ export default function Todo({ id, body, data, todos, isChecked, ...props }) {
                 successChange(id);
               }}
             >
-              <img src="/edit.png" alt="change todo" />
+              <img
+                src="https://prismatic-queijadas-86c03b.netlify.app/public/edit.png"
+                alt="change todo"
+              />
             </Button>
             <Button
               styleClasses={"button button_for-todo button_for-todo_cancel"}
@@ -124,7 +127,10 @@ export default function Todo({ id, body, data, todos, isChecked, ...props }) {
                 closePanelChange();
               }}
             >
-              <img src="/trash.png" alt="delete todo" />
+              <img
+                src="https://prismatic-queijadas-86c03b.netlify.app/public/trash.png"
+                alt="delete todo"
+              />
             </Button>
           </div>
         </>
