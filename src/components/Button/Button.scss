@@ -13,6 +13,7 @@ button:disabled {
 .button {
   background-color: transparent;
   border: 0;
+  transition: all 300ms;
 
   &_purple {
     // @include mixin.font(var(--font-size-20));
@@ -98,4 +99,8 @@ button:disabled {
   &_for-todo :nth-child(1n) {
     object-fit: contain;
   }
+}
+
+.button:active {
+  scale: 0.8;
 }
