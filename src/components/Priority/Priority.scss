@@ -1,0 +1,27 @@
+@use "../../styles/mixins.scss" as mixin;
+
+.priority {
+  padding: 5px;
+
+  &__inner {
+    padding: 1px 10px;
+
+    background-color: rgb(193, 193, 193);
+    user-select: none;
+    @include mixin.font(13, 8);
+    color: white;
+
+    border-radius: 3px;
+    text-align: center;
+  }
+
+  &_high {
+    background-color: red;
+  }
+  &_medium {
+    background-color: rgb(255, 174, 0);
+  }
+  &_low {
+    background-color: rgb(14, 212, 14);
+  }
+}

@@ -1,6 +1,7 @@
 import "./CheckboxCustom.scss";
 import "../../../src/normalize.css";
 import { useState } from "react";
+import Priority from "../Priority/Priority";
 
 export default function CheckboxCustom({
   id,

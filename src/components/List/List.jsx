@@ -14,7 +14,13 @@ export default function List() {
 
     return todos.map((todo) => {
       return (
-        <Todo key={todo.id} id={todo.id} body={todo.body} data={todo.data} />
+        <Todo
+          key={todo.id}
+          id={todo.id}
+          body={todo.body}
+          data={todo.data}
+          priority={todo.priority}
+        />
       );
     });
   }

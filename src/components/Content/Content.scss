@@ -16,15 +16,32 @@
     align-items: center;
     flex-wrap: wrap-reverse;
 
-    @include mixin.media-235() {
+    @include mixin.media-400() {
       justify-content: end;
     }
   }
-  &__button-create {
-    @include mixin.media-235() {
+
+  &__buttons {
+    @include mixin.media-X(400px) {
       width: 100%;
     }
   }
+  &__buttons > :first-child {
+    margin-right: 10px;
+  }
+
+  &__button {
+    &-create,
+    &-find {
+      // width: 100%;
+      display: inline-block;
+      @include mixin.media-400() {
+        width: 100%;
+        display: block;
+      }
+    }
+  }
+
   &__add,
   &__error {
     width: 100%;

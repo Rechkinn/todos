@@ -101,3 +101,13 @@ $min-Width: 360;
     @content;
   }
 }
+@mixin media-400() {
+  @media (max-width: 400px) {
+    @content;
+  }
+}
+@mixin media-X($X) {
+  @media (max-width: $X) {
+    @content;
+  }
+}

@@ -4,8 +4,17 @@ import CheckboxCustom from "../CheckboxCustom/CheckboxCustom.jsx";
 import Button from "../Button/Button.jsx";
 import Input from "../Input/Input.jsx";
 import { useState } from "react";
+import Priority from "../Priority/Priority.jsx";
 
-export default function Todo({ id, body, data, todos, isChecked, ...props }) {
+export default function Todo({
+  id,
+  body,
+  data,
+  todos,
+  isChecked,
+  priority,
+  ...props
+}) {
   const [isRemoving, setIsRemoving] = useState(false);
   const [isChangeActive, setIsChangeActive] = useState(false);
   const [initialInputValue, setInitialInputValue] = useState("");
@@ -138,6 +147,7 @@ export default function Todo({ id, body, data, todos, isChecked, ...props }) {
             data={data}
             isChecked={isChecked}
           />
+          <Priority priorityId={id} modifierInitial={priority} />
 
           <div className="todo__buttons">
             <Button

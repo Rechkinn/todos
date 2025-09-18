@@ -17,6 +17,9 @@ export default function Content() {
       ? JSON.parse(localStorage.getItem("todos")).option
       : "All"
   );
+  const [arrayForRender, setArrayForRender] = useState(
+    JSON.parse(localStorage.getItem("todos")).todos
+  );
 
   useEffect(() => {
     const selectElement = document.querySelector(".filter__select");
@@ -85,18 +88,33 @@ export default function Content() {
     if (activePanel === "primary") {
       return (
         <div className="filter__primary">
-          <div className="filter__button-create">
-            <Button
-              onClick={() => {
-                setActivePanel("add");
-              }}
-              styleClasses={
-                "button button_purple button_create-task button_w100"
-              }
-            >
-              Create task
-            </Button>
+          <div className="filter__buttons">
+            <div className="filter__button-create">
+              <Button
+                onClick={() => {
+                  setActivePanel("add");
+                }}
+                styleClasses={
+                  "button button_purple button_create-task button_w100"
+                }
+              >
+                Create task
+              </Button>
+            </div>
+            <div className="filter__button-find">
+              <Button
+                onClick={() => {
+                  setActivePanel("find");
+                }}
+                styleClasses={
+                  "button button_purple button_create-task button_w100"
+                }
+              >
+                Find task
+              </Button>
+            </div>
           </div>
+
           <div className="filter__div-select">
             <select
               name=""
@@ -171,6 +189,57 @@ export default function Content() {
           )}
         </div>
       );
+    } else if (activePanel === "find") {
+      return (
+        <div className="filter__content">
+          <div className="filter__div-select filter__div-select_panel-add">
+            <select
+              name=""
+              id=""
+              className="filter__select"
+              defaultValue={optionActive}
+            >
+              <option value="All" className="filter__option">
+                All
+              </option>
+              <option value="Completed" className="filter__option">
+                Completed
+              </option>
+              <option value="Active" className="filter__option">
+                Active
+              </option>
+            </select>
+          </div>
+          <div className="filter__add">
+            <div className="filter__input">
+              <Input
+                placeholder={"Enter your task"}
+                styleClasses={"input input_add-todo"}
+              />
+            </div>
+            <div className="filter__button-add">
+              <Button
+                onClick={() => {
+                  // checkError("find");
+                  setActivePanel("primary");
+                  findTask();
+                }}
+                styleClasses={"button button_purple button_add-task"}
+              >
+                Find task
+              </Button>
+            </div>
+            <div className="filter__button-add">
+              <Button
+                onClick={() => {
+                  setActivePanel("primary");
+                }}
+                styleClasses={"button button_red button_close-task"}
+              ></Button>
+            </div>
+          </div>
+        </div>
+      );
     }
   }
 
@@ -183,16 +252,28 @@ export default function Content() {
     if (document.querySelector(".input_add-todo").value !== "") {
       setShowError(false);
       setActivePanel("primary");
-      // messageListEmpty(false);
       addTask();
     } else {
       setShowError(true);
     }
   }
 
-  // кликаем на todo => оно пропадает и генерируем событие
-  // подписываемся на собитие из кстом чекбокс
-  // если не существует не одной нынешней оптион, то вызываем messageListEmpty(true);
+  function findTask() {
+    const inputToFindTodo = document.querySelector(".input_add-todo");
+
+    inputToFindTodo.value;
+
+    const arr = [
+      ...JSON.parse(localStorage.getItem("todos")).todos.filter((todo) => {
+        if (todo.body.includes(inputToFindTodo.value)) return todo;
+      }),
+    ];
+
+    console.log("arr");
+    console.log(arr);
+
+    setArrayForRender(arr);
+  }
 
   function addTask() {
     const inputAddToDo = document.querySelector(".input_add-todo");
@@ -209,10 +290,13 @@ export default function Content() {
       data: date,
       checked: false,
       option: "Active",
+      priority: "high",
     };
 
     json.todos.push(newToDo);
     localStorage.setItem("todos", JSON.stringify(json));
+
+    setArrayForRender(json.todos);
 
     // console.log(document);
     // const selectElement = document.querySelector(".filter__select");
@@ -227,7 +311,7 @@ export default function Content() {
     // );
   }
 
-  function renderTodos() {
+  function renderTodos(array) {
     if (showMessageListEmpty) {
       return (
         <p className="list__message-empty-list">
@@ -237,7 +321,9 @@ export default function Content() {
         </p>
       );
     } else {
-      return json.todos.map((todo) => {
+      // json.todos
+      // return json.todos.map((todo) => {
+      return array.map((todo) => {
         if (optionActive === "All" || optionActive === todo.option) {
           return (
             <Todo
@@ -246,6 +332,7 @@ export default function Content() {
               body={todo.body}
               data={todo.data}
               isChecked={todo.checked}
+              priority={todo.priority}
             />
           );
         }
@@ -263,7 +350,7 @@ export default function Content() {
         <div className="filter__inner">{renderActivePanel()}</div>
       </div>
       <div className="list">
-        <div className="list__inner">{renderTodos()}</div>
+        <div className="list__inner">{renderTodos(arrayForRender)}</div>
       </div>
       <Button />
     </main>

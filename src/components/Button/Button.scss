@@ -56,7 +56,7 @@ button:disabled {
   }
 
   &_w100 {
-    @include mixin.media-235() {
+    @include mixin.media-400() {
       width: 100%;
     }
   }

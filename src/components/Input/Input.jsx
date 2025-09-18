@@ -15,7 +15,7 @@ export default function Input({
     <input
       {...props}
       type="text"
-      maxLength={20}
+      // maxLength={20}
       className={styleClasses}
       placeholder={placeholder}
       onChange={(event) => {
