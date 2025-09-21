@@ -15,7 +15,7 @@ export default function CheckboxCustom({
 }) {
   const [loading, setLoading] = useState(false);
 
-  async function updateCheked(idTodo, inputCheked) {
+  async function updateChecked(idTodo, inputCheked) {
     try {
       setLoading(true);
       const ref = doc(db, "todos", idTodo);
@@ -45,7 +45,7 @@ export default function CheckboxCustom({
     parentCheckbox
       .querySelector("label")
       .classList.toggle("checkbox__label_complete");
-    updateCheked(idTask, input.checked);
+    updateChecked(idTask, input.checked);
   }
 
   document.addEventListener("changeTodo", (event) => {
@@ -75,12 +75,16 @@ export default function CheckboxCustom({
             className="checkbox__input-original hidden"
             checked={isChecked}
             onChange={() => {}}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                completeTask(id);
+              }
+            }}
           />
           <span
+            id={id}
             className="checkbox__input-custom"
-            onClick={() => {
-              completeTask(id);
-            }}
+            onClick={() => completeTask(id)}
           ></span>
         </div>
         <div className="checkbox__body">

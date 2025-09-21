@@ -48,6 +48,10 @@ $color: rgb(199, 199, 199);
     }
   }
 
+  &__input-original:focus + &__input-custom {
+    outline: 2px solid black;
+  }
+
   &__body {
     display: flex;
     flex-direction: column;
