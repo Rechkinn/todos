@@ -1,0 +1,60 @@
+@use "../../styles/mixins.scss" as mixin;
+
+@keyframes disappear {
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.notification {
+  padding: 10px;
+  position: fixed;
+  top: 0;
+
+  width: 100vw;
+
+  z-index: 300;
+  left: 50%;
+  transform: translate(-50%);
+
+  animation-name: disappear;
+  animation-timing-function: linear;
+  animation-duration: 5s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+
+  &__inner {
+    margin: auto;
+    padding: 10px;
+    max-width: 100%;
+    // min-height: 75px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: rgb(163, 163, 163);
+    background-color: rgb(235, 235, 235);
+    border: 3px solid rgb(163, 163, 163);
+    border-radius: 15px;
+    text-align: center;
+
+    &_success {
+      color: rgb(0, 214, 0);
+      background-color: rgb(221, 255, 170);
+      border: 3px solid rgb(0, 214, 0);
+    }
+    &_fall {
+      color: rgb(214, 0, 0);
+      background-color: rgb(255, 170, 170);
+      border: 3px solid rgb(214, 0, 0);
+    }
+  }
+
+  &__text {
+    @include mixin.font(18, 15);
+  }
+}

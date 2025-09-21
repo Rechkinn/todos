@@ -3,6 +3,7 @@ import Todo from "../Todo/Todo";
 import Button from "../Button/Button.jsx";
 import Input from "../Input/Input.jsx";
 import Loader from "../Loader/Loader.jsx";
+import Notification from "../Notification/Notification.jsx";
 import { useEffect, useState } from "react";
 import {
   collection,
@@ -21,6 +22,7 @@ export default function Content() {
   const [optionActive, setOptionActive] = useState("All");
   const [uid, setUid] = useState(localStorage.getItem("uid"));
   const [arrayForRender, setArrayForRender] = useState([]);
+  const [notification, setNotification] = useState("");
   const [isAccessTokenUser, setIsAccessTokenUser] = useState(
     localStorage.getItem("accessToken") ? true : false
   );
@@ -33,13 +35,13 @@ export default function Content() {
       setLoading(true);
       try {
         const items = await getTodos(uid);
-        if (mounted) {
-          setArrayForRender(items);
-        }
+        if (mounted) setArrayForRender(items);
       } catch (error) {
         alert(error);
       } finally {
-        if (mounted) setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     }
 
@@ -62,13 +64,11 @@ export default function Content() {
       const snap = await getDocs(q);
       setArrayForRender(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
       return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      // return items;
-    } catch (err) {
-      console.error("fetchTodosForUser error:", err);
-      throw err;
+    } catch (error) {
+      alert(`${error}`);
+      throw error;
     }
   }
-
   async function addTask() {
     try {
       setLoading(true);
@@ -91,13 +91,16 @@ export default function Content() {
       const ref = doc(db, "todos", `${generateId}`);
       await setDoc(ref, newToDo);
       setArrayForRender(await getTodos(uid));
+      setNotification("success");
     } catch (error) {
-      alert(`Error create task. More info: ${error}`);
+      setNotification(`${error}`);
     } finally {
+      setTimeout(() => {
+        setNotification("");
+      }, 5000);
       setLoading(false);
     }
   }
-
   async function choiceOption(option) {
     try {
       setLoading(true);
@@ -116,7 +119,6 @@ export default function Content() {
       setLoading(false);
     }
   }
-
   async function findTask() {
     try {
       setLoading(true);
@@ -130,11 +132,14 @@ export default function Content() {
       );
 
       setArrayForRender(filtered);
+      setNotification("success");
     } catch (error) {
-      alert(error);
-      throw error;
+      setNotification(`${error}`);
     } finally {
       setLoading(false);
+      setTimeout(() => {
+        setNotification("");
+      }, 5000);
     }
   }
 
@@ -151,7 +156,6 @@ export default function Content() {
       break;
     }
   }
-
   function renderActivePanel() {
     if (activePanel === "primary") {
       return (
@@ -314,7 +318,6 @@ export default function Content() {
       );
     }
   }
-
   function checkError() {
     if (document.querySelector(".input_add-todo").value !== "") {
       setShowError(false);
@@ -324,7 +327,6 @@ export default function Content() {
       setShowError(true);
     }
   }
-
   function renderTodos(array) {
     if (array.length == 0) {
       return (
@@ -368,6 +370,18 @@ export default function Content() {
   return (
     <main>
       {loading && <Loader />}
+      {notification === "success" && (
+        <Notification
+          modifier={notification}
+          text={"The operation was completed successfully!"}
+        />
+      )}
+      {notification !== "success" && notification !== "" && (
+        <Notification
+          modifier={"fall"}
+          text={"An error occurred while performing the operation!"}
+        />
+      )}
       <div className="filter">
         <div className="filter__inner">{renderActivePanel()}</div>
       </div>

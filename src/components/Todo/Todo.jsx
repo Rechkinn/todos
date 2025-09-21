@@ -4,16 +4,9 @@ import Button from "../Button/Button.jsx";
 import Input from "../Input/Input.jsx";
 import Priority from "../Priority/Priority.jsx";
 import Loader from "../Loader/Loader.jsx";
+import Notification from "../Notification/Notification.jsx";
 import { useState } from "react";
-import {
-  collection,
-  doc,
-  query,
-  where,
-  getDocs,
-  deleteDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../myFirebase.js";
 
 export default function Todo({
@@ -30,16 +23,20 @@ export default function Todo({
   const [isChangeActive, setIsChangeActive] = useState(false);
   const [initialInputValue, setInitialInputValue] = useState("");
   const [bodyValue, setBodyValue] = useState(body);
+  const [notification, setNotification] = useState("");
 
   async function deleteTodo(idTodo) {
     try {
       setLoading(true);
       await deleteDoc(doc(db, "todos", idTodo));
       createEventUpdateTodos();
+      setNotification("success");
     } catch (error) {
-      alert(error);
-      throw error;
+      setNotification(`${error}`);
     } finally {
+      setTimeout(() => {
+        setNotification("");
+      }, 5000);
       setLoading(false);
     }
   }
@@ -54,10 +51,13 @@ export default function Todo({
           .slice(0, 5)} - ${new Date().toLocaleDateString()}`,
       });
       createEventUpdateTodos();
+      setNotification("success");
     } catch (error) {
-      alert("Error update: ", error);
-      throw error;
+      setNotification(`${error}`);
     } finally {
+      setTimeout(() => {
+        setNotification("");
+      }, 5000);
       setLoading(false);
     }
   }
@@ -174,6 +174,18 @@ export default function Todo({
   return (
     <>
       {loading && <Loader />}
+      {notification === "success" && (
+        <Notification
+          modifier={notification}
+          text={"The operation was completed successfully!"}
+        />
+      )}
+      {notification !== "success" && notification !== "" && (
+        <Notification
+          modifier={"fall"}
+          text={"An error occurred while performing the operation!"}
+        />
+      )}
       <div className="todo">
         <div className="todo__inner " id={"todo__inner" + id}>
           {renderTodo()}

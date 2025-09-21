@@ -4,6 +4,7 @@ import "./App.css";
 import { Routes, Route } from "react-router-dom";
 
 import Header from "./components/Header/Header.jsx";
+import Notification from "./components/Notification/Notification.jsx";
 import Content from "./components/Content/Content.jsx";
 import Authorization from "./components/Authorization/Authorization.jsx";
 import PrivateRoute from "./router/PrivateRoute.jsx";
@@ -12,6 +13,7 @@ export default function App() {
   return (
     <>
       <Header />
+      {/* <Notification /> */}
       <Routes>
         <Route element={<PrivateRoute />}>
           <Route path="/" element={<Content />} />

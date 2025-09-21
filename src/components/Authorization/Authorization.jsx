@@ -8,11 +8,13 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../../myFirebase";
+import Notification from "../Notification/Notification";
 
 export default function Authorization({ action = "Sign In" }) {
   const [loading, setLoading] = useState(false);
   const [errorEmail, setErrorEmail] = useState(false);
   const [errorPassword, setErrorPassword] = useState(false);
+  const [notification, setNotification] = useState("");
   const showContent = useNavigate();
 
   async function SignUp(event) {
@@ -45,11 +47,13 @@ export default function Authorization({ action = "Sign In" }) {
         );
         localStorage.setItem("accessToken", response.user.accessToken);
         createEventSuccessSignIn(response.user.uid);
+        setNotification("success");
       } catch (error) {
-        alert(
-          `Account creation error. A user with the same email address already exists. More info: ${error}`
-        );
+        setNotification(`${error}`);
       } finally {
+        setTimeout(() => {
+          setNotification("");
+        }, 5000);
         setLoading(false);
       }
     }
@@ -66,9 +70,13 @@ export default function Authorization({ action = "Sign In" }) {
       const response = await signInWithEmailAndPassword(auth, email, password);
       localStorage.setItem("accessToken", response.user.accessToken);
       createEventSuccessSignIn(response.user.uid);
+      setNotification("success");
     } catch (error) {
-      alert(`Error sign in. ${error}`);
+      setNotification(`${error}`);
     } finally {
+      setTimeout(() => {
+        setNotification("");
+      }, 5000);
       setLoading(false);
     }
   }
@@ -101,6 +109,18 @@ export default function Authorization({ action = "Sign In" }) {
   return (
     <>
       {loading && <Loader />}
+      {notification === "success" && (
+        <Notification
+          modifier={notification}
+          text={"The operation was completed successfully!"}
+        />
+      )}
+      {notification !== "success" && notification !== "" && (
+        <Notification
+          modifier={"fall"}
+          text={"An error occurred while performing the operation!"}
+        />
+      )}
       <div className="form">
         <form className="form__inner">
           <h1 className="form__title">{action + " for the TODO app"}</h1>
