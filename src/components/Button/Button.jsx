@@ -1,8 +1,13 @@
 import "./Button.scss";
 
-export default function Button({ styleClasses, children, disable, ...props }) {
+export default function Button({
+  styleClasses,
+  children,
+  disable = false,
+  ...props
+}) {
   return (
-    <button {...props} className={styleClasses}>
+    <button disabled={disable} {...props} className={styleClasses}>
       {children}
     </button>
   );

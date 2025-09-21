@@ -1,88 +1,156 @@
 import "./Content.scss";
-
 import Todo from "../Todo/Todo";
 import Button from "../Button/Button.jsx";
 import Input from "../Input/Input.jsx";
-
+import Loader from "../Loader/Loader.jsx";
 import { useEffect, useState } from "react";
+import {
+  collection,
+  doc,
+  setDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+import { db } from "../../myFirebase.js";
 
 export default function Content() {
-  const [activePanel, setActivePanel] = useState("primary");
+  const [loading, setLoading] = useState(true);
   const [showError, setShowError] = useState(false);
-  const [showMessageListEmpty, setShowMessageListEmpty] = useState(
-    localStorage.getItem("showMessageListEmpty") === "false" ? false : true
-  );
-  const [optionActive, setOptionActive] = useState(
-    JSON.parse(localStorage.getItem("todos"))
-      ? JSON.parse(localStorage.getItem("todos")).option
-      : "All"
-  );
-  const [arrayForRender, setArrayForRender] = useState(
-    JSON.parse(localStorage.getItem("todos")).todos
+  const [activePanel, setActivePanel] = useState("primary");
+  const [optionActive, setOptionActive] = useState("All");
+  const [uid, setUid] = useState(localStorage.getItem("uid"));
+  const [arrayForRender, setArrayForRender] = useState([]);
+  const [isAccessTokenUser, setIsAccessTokenUser] = useState(
+    localStorage.getItem("accessToken") ? true : false
   );
 
   useEffect(() => {
-    const selectElement = document.querySelector(".filter__select");
-    if (selectElement) {
-      document.dispatchEvent(
-        new CustomEvent("updateList", {
-          bubbles: true,
-          detail: {
-            selectElement: selectElement,
-          },
-        })
-      );
+    let mounted = true;
+    if (!uid) return;
+
+    async function load() {
+      setLoading(true);
+      try {
+        const items = await getTodos(uid);
+        if (mounted) {
+          setArrayForRender(items);
+        }
+      } catch (error) {
+        alert(error);
+      } finally {
+        if (mounted) setLoading(false);
+      }
     }
-  }, [activePanel]);
+
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [uid]);
 
   let json = {
-    todos: [],
-    option: "All",
+    option: localStorage.getItem("todos")
+      ? localStorage.getItem("todos")
+      : "All",
   };
 
-  if (localStorage.getItem("todos")) {
-    json.todos = JSON.parse(localStorage.getItem("todos")).todos;
-    json.option = JSON.parse(localStorage.getItem("todos")).option;
-  } else {
-    localStorage.setItem("todos", JSON.stringify(json));
+  async function getTodos(uid) {
+    if (!uid) return [];
+    try {
+      const q = query(collection(db, "todos"), where("userId", "==", uid));
+      const snap = await getDocs(q);
+      setArrayForRender(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      // return items;
+    } catch (err) {
+      console.error("fetchTodosForUser error:", err);
+      throw err;
+    }
+  }
+
+  async function addTask() {
+    try {
+      setLoading(true);
+      const inputAddToDo = document.querySelector(".input_add-todo");
+      const date = `${new Date()
+        .toLocaleTimeString()
+        .slice(0, 5)} - ${new Date().toLocaleDateString()}`;
+      const generateId = `${Math.random()}`.slice(2);
+      const newToDo = {
+        id: generateId,
+        description: inputAddToDo.value,
+        completed: false,
+        priority: "high",
+        createdAt: date,
+        updatedAt: date,
+        userId: uid,
+        option: "Active",
+      };
+
+      const ref = doc(db, "todos", `${generateId}`);
+      await setDoc(ref, newToDo);
+      setArrayForRender(await getTodos(uid));
+    } catch (error) {
+      alert(`Error create task. More info: ${error}`);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function choiceOption(option) {
+    try {
+      setLoading(true);
+
+      const ref = collection(db, "todos");
+      const constraints = [where("userId", "==", uid)];
+      if (option !== "All") constraints.push(where("option", "==", option));
+      const q = query(ref, ...constraints);
+      const snap = await getDocs(q);
+      const todos = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setArrayForRender(todos);
+    } catch (error) {
+      alert("Error choice option. ", error);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function findTask() {
+    try {
+      setLoading(true);
+
+      const inputToFindTodo = document.querySelector(".input_add-todo");
+      const q = query(collection(db, "todos"), where("userId", "==", uid));
+      const snap = await getDocs(q);
+      const todos = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const filtered = todos.filter((todo) =>
+        todo.description?.startsWith(inputToFindTodo.value)
+      );
+
+      setArrayForRender(filtered);
+    } catch (error) {
+      alert(error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   }
 
   function selectOption(selectElement) {
     for (let i = 0; i < selectElement.children.length; i++) {
-      if (selectElement.children[i].selected) {
-        json = JSON.parse(localStorage.getItem("todos"));
-        json.option = selectElement.children[i].label;
-        localStorage.setItem("todos", JSON.stringify(json));
+      if (!selectElement.children[i].selected) continue;
 
-        let needSetShowMessageListEmpty = true;
-        for (let k = 0; k < json.todos.length; k++) {
-          if (json.todos[k].option === json.option || json.option === "All") {
-            needSetShowMessageListEmpty = false;
-            messageListEmpty(false);
-            break;
-          }
-        }
-        if (needSetShowMessageListEmpty) {
-          messageListEmpty(true);
-        }
+      json = JSON.parse(localStorage.getItem("todos"));
+      json.option = selectElement.children[i].label;
+      localStorage.setItem("todos", JSON.stringify(json));
 
-        setOptionActive(selectElement.children[i].label);
-        break;
-      }
+      choiceOption(json.option);
+      setOptionActive(selectElement.children[i].label);
+      break;
     }
   }
-
-  document.addEventListener("click", (event) => {
-    if (event.target.closest(".filter__select")) {
-      selectOption(event.target);
-    }
-  });
-  document.addEventListener("updateList", (event) => {
-    selectOption(event.detail.selectElement);
-  });
-  document.addEventListener("renderPanelAdd", () => {
-    setActivePanel("primary");
-  });
 
   function renderActivePanel() {
     if (activePanel === "primary") {
@@ -97,6 +165,7 @@ export default function Content() {
                 styleClasses={
                   "button button_purple button_create-task button_w100"
                 }
+                disabled={!isAccessTokenUser}
               >
                 Create task
               </Button>
@@ -109,6 +178,7 @@ export default function Content() {
                 styleClasses={
                   "button button_purple button_create-task button_w100"
                 }
+                disabled={!isAccessTokenUser}
               >
                 Find task
               </Button>
@@ -213,7 +283,9 @@ export default function Content() {
           <div className="filter__add">
             <div className="filter__input">
               <Input
-                placeholder={"Enter your task"}
+                placeholder={
+                  "Enter the beginning of the task you are looking for"
+                }
                 styleClasses={"input input_add-todo"}
               />
             </div>
@@ -243,11 +315,6 @@ export default function Content() {
     }
   }
 
-  function messageListEmpty(boolValue) {
-    localStorage.setItem("showMessageListEmpty", boolValue);
-    setShowMessageListEmpty(boolValue);
-  }
-
   function checkError() {
     if (document.querySelector(".input_add-todo").value !== "") {
       setShowError(false);
@@ -258,61 +325,8 @@ export default function Content() {
     }
   }
 
-  function findTask() {
-    const inputToFindTodo = document.querySelector(".input_add-todo");
-
-    inputToFindTodo.value;
-
-    const arr = [
-      ...JSON.parse(localStorage.getItem("todos")).todos.filter((todo) => {
-        if (todo.body.includes(inputToFindTodo.value)) return todo;
-      }),
-    ];
-
-    console.log("arr");
-    console.log(arr);
-
-    setArrayForRender(arr);
-  }
-
-  function addTask() {
-    const inputAddToDo = document.querySelector(".input_add-todo");
-
-    const date = `${new Date()
-      .toLocaleTimeString()
-      .slice(0, 5)} - ${new Date().toLocaleDateString()}`;
-
-    const generateId = `${Math.random()}`.slice(2);
-
-    const newToDo = {
-      id: generateId,
-      body: inputAddToDo.value,
-      data: date,
-      checked: false,
-      option: "Active",
-      priority: "high",
-    };
-
-    json.todos.push(newToDo);
-    localStorage.setItem("todos", JSON.stringify(json));
-
-    setArrayForRender(json.todos);
-
-    // console.log(document);
-    // const selectElement = document.querySelector(".filter__select");
-    // console.log(selectElement);
-    // document.dispatchEvent(
-    //   new CustomEvent("updateList", {
-    //     bubbles: true,
-    //     detail: {
-    //       selectElement: selectElement,
-    //     },
-    //   })
-    // );
-  }
-
   function renderTodos(array) {
-    if (showMessageListEmpty) {
+    if (array.length == 0) {
       return (
         <p className="list__message-empty-list">
           <span className="list__message-empty-list-text">
@@ -321,18 +335,17 @@ export default function Content() {
         </p>
       );
     } else {
-      // json.todos
-      // return json.todos.map((todo) => {
       return array.map((todo) => {
         if (optionActive === "All" || optionActive === todo.option) {
           return (
             <Todo
               key={todo.id}
               id={todo.id}
-              body={todo.body}
-              data={todo.data}
-              isChecked={todo.checked}
+              body={todo.description}
+              isChecked={todo.completed}
               priority={todo.priority}
+              dataCreatedAt={todo.createdAt}
+              dataUpdatedAt={todo.updatedAt}
             />
           );
         }
@@ -340,12 +353,21 @@ export default function Content() {
     }
   }
 
-  document.addEventListener("isEmptyList", () => {
-    messageListEmpty(true);
+  document.addEventListener("updateTodos", () => getTodos(uid));
+  document.addEventListener("successSignIn", () => setIsAccessTokenUser(true));
+  document.addEventListener("logOut", () => setIsAccessTokenUser(false));
+  document.addEventListener("click", (event) => {
+    if (event.target.closest(".filter__select")) {
+      selectOption(event.target);
+    }
+  });
+  document.addEventListener("renderPanelAdd", () => {
+    setActivePanel("primary");
   });
 
   return (
     <main>
+      {loading && <Loader />}
       <div className="filter">
         <div className="filter__inner">{renderActivePanel()}</div>
       </div>

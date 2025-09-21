@@ -7,7 +7,7 @@ button {
 }
 
 button:disabled {
-  opacity: 0.4;
+  filter: contrast(30%);
 }
 
 .button {
@@ -16,7 +16,6 @@ button:disabled {
   transition: all 300ms;
 
   &_purple {
-    // @include mixin.font(var(--font-size-20));
     @include mixin.font(20, 10);
     background-color: var(--color-purple);
     color: white;
@@ -25,17 +24,14 @@ button:disabled {
   }
   &_red {
     position: relative;
-    // @include mixin.font(var(--font-size-20));
     @include mixin.font(20, 10);
     background-color: red;
-    // color: white;
     width: 44px;
     height: 100%;
     border-radius: 10px;
   }
   &_red::before,
   &_red::after {
-    // @include mixin.font(var(--font-size-20));
     position: absolute;
     top: 46%;
     left: 25%;
@@ -43,7 +39,6 @@ button:disabled {
     content: "";
     height: 2.5px;
     border-radius: 10px;
-    // width: 80%;
     width: 50%;
     display: block;
     background-color: white;
@@ -54,18 +49,15 @@ button:disabled {
   &_red::after {
     rotate: -45deg;
   }
-
   &_w100 {
     @include mixin.media-400() {
       width: 100%;
     }
   }
-
   &_create-task {
     padding: 7px 14px;
   }
   &_add-task {
-    // padding: 3px 14px;
     padding: 7px 14px;
     border-radius: 0;
   }
@@ -74,13 +66,8 @@ button:disabled {
     border-top-left-radius: $border-radius;
     border-bottom-left-radius: $border-radius;
   }
-
   &_for-todo {
-    // padding: 4px;
     @include mixin.fluid-padding(5, 4);
-    // $wh: 17px;
-    // width: $wh;
-    // height: $wh;
     @include mixin.fluid-wh(22, 15);
     background-color: rgb(221, 221, 221);
     border-radius: 3px;
@@ -88,7 +75,6 @@ button:disabled {
     &_success {
       background-color: rgb(120, 201, 0);
     }
-
     &_cancel {
       background-color: red;
     }
@@ -98,6 +84,17 @@ button:disabled {
   }
   &_for-todo :nth-child(1n) {
     object-fit: contain;
+  }
+  &_auth {
+    @include mixin.font(12, 12);
+    width: auto;
+    padding: 3px 12px;
+    border-radius: 5px;
+    background-color: white;
+    color: black;
+  }
+  &_form {
+    background-color: var(--color-purple);
   }
 }
 

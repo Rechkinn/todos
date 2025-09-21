@@ -22,7 +22,7 @@
   }
 
   &__buttons {
-    @include mixin.media-X(400px) {
+    @include mixin.media-400 {
       width: 100%;
     }
   }
@@ -33,11 +33,16 @@
   &__button {
     &-create,
     &-find {
-      // width: 100%;
       display: inline-block;
       @include mixin.media-400() {
         width: 100%;
         display: block;
+      }
+    }
+
+    &-create {
+      @include mixin.media-400 {
+        margin-bottom: 10px;
       }
     }
   }
@@ -48,9 +53,11 @@
     padding: 0 10px;
     display: flex;
   }
+
   &__input {
     width: 100%;
   }
+
   &__message {
     color: red;
     @include mixin.font(14, 7);
@@ -59,13 +66,12 @@
 
   &__select {
     padding: 7px 10px;
-    // font-size: 14px;
-    // font-family: sans-serif;
     @include mixin.font(14, 8);
     font-weight: normal;
     background-color: rgb(187, 187, 187);
     border: 0;
     border-radius: 10px;
+
     @include mixin.media-235() {
       margin-bottom: 10px;
     }
@@ -76,6 +82,10 @@
       padding: 10px;
       display: flex;
       justify-content: end;
+    }
+
+    @include mixin.media-400 {
+      margin-bottom: 10px;
     }
   }
 }
@@ -93,6 +103,7 @@
     border-radius: 10px;
     min-height: $min-height;
   }
+
   &__message-empty-list {
     min-height: calc(calc($min-height - $padding) - $padding);
     display: flex;

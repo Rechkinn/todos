@@ -1,0 +1,54 @@
+@use "../../styles/mixins.scss" as mixin;
+@use "../../styles/variables.scss";
+
+.form {
+  padding: 10px;
+
+  &__inner {
+    margin: auto;
+    margin-top: 20px;
+    padding: 10px 0 15px;
+    max-width: 400px;
+    background-color: var(--color-gray);
+    border-radius: 30px;
+  }
+
+  &__title {
+    user-select: none;
+    margin: 0;
+    @include mixin.font(22, 17);
+    text-align: center;
+  }
+
+  &__email,
+  &__password {
+    padding: 5px;
+    display: block;
+    margin: auto;
+
+    width: 70%;
+    border-radius: 1111px;
+    text-align: center;
+    border: 0;
+  }
+
+  &__button {
+    @include mixin.font(20, 20);
+    display: block;
+    margin: auto;
+    width: 70%;
+    border-radius: 111px;
+    background-color: var(--color-purple);
+    color: white;
+  }
+
+  &__error {
+    @include mixin.font(12, 7);
+    color: red;
+    text-align: center;
+  }
+}
+
+.form :nth-child(n):not(:last-child) {
+  margin-bottom: 10px;
+}

@@ -1,52 +1,71 @@
 import "./Todo.scss";
-
 import CheckboxCustom from "../CheckboxCustom/CheckboxCustom.jsx";
 import Button from "../Button/Button.jsx";
 import Input from "../Input/Input.jsx";
-import { useState } from "react";
 import Priority from "../Priority/Priority.jsx";
+import Loader from "../Loader/Loader.jsx";
+import { useState } from "react";
+import {
+  collection,
+  doc,
+  query,
+  where,
+  getDocs,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
+import { db } from "../../myFirebase.js";
 
 export default function Todo({
   id,
   body,
-  data,
+  dataCreatedAt = "--:-- - --.--.----",
+  dataUpdatedAt = "--:-- - --.--.----",
   todos,
   isChecked,
   priority,
   ...props
 }) {
-  const [isRemoving, setIsRemoving] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [isChangeActive, setIsChangeActive] = useState(false);
   const [initialInputValue, setInitialInputValue] = useState("");
   const [bodyValue, setBodyValue] = useState(body);
-  // const [isButtonDisabled, setIsButtonDisabled] = useState(isChecked);
 
-  function deleteTodo(idTodo) {
-    // document.dispatchEvent(new Event("renderPanelAdd", { bubbles: true }));
-
-    let json = {
-      todos: JSON.parse(localStorage.getItem("todos")).todos,
-    };
-    json.todos = [...json.todos.filter((todo) => todo.id !== idTodo)];
-    localStorage.setItem("todos", JSON.stringify(json));
-
-    if (json.todos.length === 0) {
-      document.dispatchEvent(new Event("isEmptyList", { bubbles: true }));
+  async function deleteTodo(idTodo) {
+    try {
+      setLoading(true);
+      await deleteDoc(doc(db, "todos", idTodo));
+      createEventUpdateTodos();
+    } catch (error) {
+      alert(error);
+      throw error;
+    } finally {
+      setLoading(false);
     }
-
-    setIsRemoving(true);
-
-    document.dispatchEvent(
-      new CustomEvent("updateList", {
-        bubbles: true,
-        detail: {
-          selectElement: document.querySelector(".filter__select"),
-        },
-      })
-    );
+  }
+  async function updateTodo(idTodo, newDescription) {
+    try {
+      setLoading(true);
+      const ref = doc(db, "todos", idTodo);
+      await updateDoc(ref, {
+        description: newDescription,
+        updatedAt: `${new Date()
+          .toLocaleTimeString()
+          .slice(0, 5)} - ${new Date().toLocaleDateString()}`,
+      });
+      createEventUpdateTodos();
+    } catch (error) {
+      alert("Error update: ", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function changeTodo(idTodo) {
+  function createEventUpdateTodos() {
+    document.dispatchEvent(new CustomEvent("updateTodos", { bubbles: true }));
+  }
+  function createEventChangeTodo(idTodo) {
     document.dispatchEvent(
       new CustomEvent("changeTodo", {
         bubbles: true,
@@ -61,53 +80,27 @@ export default function Todo({
       .classList.add("todo__inner_for-change-todo");
 
     setIsChangeActive(true);
-    // _for-change-todo
   }
-
-  document.addEventListener("pushLabelValue", (event) => {
-    setInitialInputValue(event.detail.labelValue);
-  });
-
   function closePanelChange() {
     document
       .getElementById(`todo__inner${id}`)
       .classList.remove("todo__inner_for-change-todo");
     setIsChangeActive(false);
   }
-
   function successChange(idInput) {
     const newValue = document.getElementById(
       `input-for-change-${idInput}`
     ).value;
 
-    let json = JSON.parse(localStorage.getItem("todos"));
-
-    for (let i = 0; i < json.todos.length; i++) {
-      if (json.todos[i].id === idInput) {
-        if (newValue === "") {
-          json.todos = [
-            ...json.todos.slice(0, i),
-            ...json.todos.slice(i + 1, json.todos.length),
-          ];
-
-          setIsRemoving(true);
-        } else {
-          json.todos[i].body = newValue;
-          setBodyValue(newValue);
-        }
-        break;
-      }
+    if (newValue === "") {
+      deleteTodo(idInput);
+      return;
     }
 
-    if (json.todos.length === 0) {
-      document.dispatchEvent(new Event("isEmptyList", { bubbles: true }));
-    }
-
-    localStorage.setItem("todos", JSON.stringify(json));
-
+    updateTodo(idInput, newValue);
+    setBodyValue(newValue);
     closePanelChange();
   }
-
   function renderTodo() {
     if (isChangeActive) {
       return (
@@ -125,7 +118,7 @@ export default function Todo({
                 successChange(id);
               }}
             >
-              <img src="/edit.png" alt="change todo" />
+              <img src="/approve.png" alt="Approve changing todo" />
             </Button>
             <Button
               styleClasses={"button button_for-todo button_for-todo_cancel"}
@@ -133,7 +126,7 @@ export default function Todo({
                 closePanelChange();
               }}
             >
-              <img src="/trash.png" alt="delete todo" />
+              <img src="/cancel.png" alt="Cancel changing todo" />
             </Button>
           </div>
         </>
@@ -144,7 +137,8 @@ export default function Todo({
           <CheckboxCustom
             id={id}
             body={bodyValue}
-            data={data}
+            dataCreatedAt={dataCreatedAt}
+            dataUpdatedAt={dataUpdatedAt}
             isChecked={isChecked}
           />
           <Priority priorityId={id} modifierInitial={priority} />
@@ -154,9 +148,8 @@ export default function Todo({
               id={id}
               styleClasses={"button button_for-todo"}
               onClick={() => {
-                changeTodo(id);
+                createEventChangeTodo(id);
               }}
-              // disabled={isButtonDisabled}
             >
               <img src="/edit.png" alt="" />
             </Button>
@@ -174,31 +167,18 @@ export default function Todo({
     }
   }
 
-  // document.addEventListener("completeTask", (event) => {
-  // const todoInner = document.getElementById(
-  //   `todo__inner${event.detail.idTodo}`
-  // );
-  // for (let i = 0; i < todoInner.children.length; i++) {
-  //   if (todoInner.children[i].classList.contains("todo__buttons")) {
-  //     todoInner.children[i].children[0].disabled = event.detail.disabled;
-  //     // todoInner.children[i].children[1].disabled = event.detail.disabled;
-  //     break;
-  //   }
-  // }
-  // if (event.detail.idTodo === id) {
-  //   setIsButtonDisabled(event.detail.disabled);
-  // }
-  // });
+  document.addEventListener("pushLabelValue", (event) => {
+    setInitialInputValue(event.detail.labelValue);
+  });
 
   return (
     <>
-      {!isRemoving && (
-        <div className="todo">
-          <div className="todo__inner " id={"todo__inner" + id}>
-            {renderTodo()}
-          </div>
+      {loading && <Loader />}
+      <div className="todo">
+        <div className="todo__inner " id={"todo__inner" + id}>
+          {renderTodo()}
         </div>
-      )}
+      </div>
     </>
   );
 }

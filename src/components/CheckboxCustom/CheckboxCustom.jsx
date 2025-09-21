@@ -1,57 +1,51 @@
 import "./CheckboxCustom.scss";
 import "../../../src/normalize.css";
 import { useState } from "react";
-import Priority from "../Priority/Priority";
+import Loader from "../Loader/Loader";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../../myFirebase.js";
 
 export default function CheckboxCustom({
   id,
   body,
-  data,
+  dataCreatedAt,
+  dataUpdatedAt,
   isChecked,
   ...props
 }) {
-  // const [textBody, setTextBody] = useState(body);
+  const [loading, setLoading] = useState(false);
 
+  async function updateCheked(idTodo, inputCheked) {
+    try {
+      setLoading(true);
+      const ref = doc(db, "todos", idTodo);
+      await updateDoc(ref, {
+        completed: inputCheked,
+        option: inputCheked ? "Completed" : "Active",
+        updatedAt: `${new Date()
+          .toLocaleTimeString()
+          .slice(0, 5)} - ${new Date().toLocaleDateString()}`,
+      });
+      createEventUpdateTodos();
+    } catch (error) {
+      alert("Error update. ", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function createEventUpdateTodos() {
+    document.dispatchEvent(new CustomEvent("updateTodos", { bubbles: true }));
+  }
   function completeTask(idTask) {
     const input = document.querySelector(`#input${idTask}`);
-
-    // document.dispatchEvent(
-    //   new CustomEvent("completeTask", {
-    //     bubbles: false,
-    //     detail: {
-    //       idTodo: id,
-    //       disabled: !input.checked,
-    //     },
-    //   })
-    // );
-
     input.checked = !input.checked;
-
     let parentCheckbox = input.closest(".checkbox");
     parentCheckbox
       .querySelector("label")
       .classList.toggle("checkbox__label_complete");
-
-    let json = JSON.parse(localStorage.getItem("todos"));
-    for (let i = 0; i < json.todos.length; i++) {
-      if (json.todos[i].id === idTask) {
-        json.todos[i].checked = !json.todos[i].checked;
-        if (json.todos[i].checked) {
-          json.todos[i].option = "Completed";
-        } else {
-          json.todos[i].option = "Active";
-        }
-
-        break;
-      }
-    }
-    localStorage.setItem("todos", JSON.stringify(json));
-    // document.dispatchEvent(
-    //   new Event("updateList", {
-    //     bubbles: true,
-    //     selectElement: document.querySelector(".filter__select"),
-    //   })
-    // );
+    updateCheked(idTask, input.checked);
   }
 
   document.addEventListener("changeTodo", (event) => {
@@ -63,51 +57,56 @@ export default function CheckboxCustom({
       new CustomEvent("pushLabelValue", {
         bubbles: true,
         detail: {
-          labelValue: str.slice(0, str.length - 18),
-          // 18 символов - это дата и время
+          // 70 символов - это строки "Date of creation" и "Last updated", а также их значения
+          labelValue: str.slice(0, str.length - 70),
         },
       })
     );
   });
 
   return (
-    <div className="checkbox">
-      <div className="checkbox__input">
-        <input
-          type="checkbox"
-          id={"input" + id}
-          // className="checkbox__input-original"
-          className="checkbox__input-original hidden"
-          checked={isChecked}
-          onChange={() => {}}
-        />
-        <span
-          className="checkbox__input-custom"
-          onClick={() => {
-            completeTask(id);
-          }}
-        ></span>
+    <>
+      {loading && <Loader />}
+      <div className="checkbox">
+        <div className="checkbox__input">
+          <input
+            type="checkbox"
+            id={"input" + id}
+            className="checkbox__input-original hidden"
+            checked={isChecked}
+            onChange={() => {}}
+          />
+          <span
+            className="checkbox__input-custom"
+            onClick={() => {
+              completeTask(id);
+            }}
+          ></span>
+        </div>
+        <div className="checkbox__body">
+          <label
+            htmlFor={"input" + id}
+            id={"label" + id}
+            className={
+              isChecked
+                ? "checkbox__label checkbox__label_complete"
+                : "checkbox__label"
+            }
+            onClick={(event) => {
+              event.preventDefault();
+              completeTask(id);
+            }}
+          >
+            {body}
+            <data value="" className="checkbox__data">
+              Date of creation: {dataCreatedAt}.
+            </data>
+            <data value="" className="checkbox__data">
+              Last updated: {dataUpdatedAt}.
+            </data>
+          </label>
+        </div>
       </div>
-      <div className="checkbox__body">
-        <label
-          htmlFor={"input" + id}
-          id={"label" + id}
-          className={
-            isChecked
-              ? "checkbox__label checkbox__label_complete"
-              : "checkbox__label"
-          }
-          onClick={(event) => {
-            event.preventDefault();
-            completeTask(id);
-          }}
-        >
-          {body}
-          <data value="" className="checkbox__data">
-            {data}
-          </data>
-        </label>
-      </div>
-    </div>
+    </>
   );
 }
